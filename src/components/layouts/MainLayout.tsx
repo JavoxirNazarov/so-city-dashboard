@@ -1,22 +1,18 @@
 import {
   Box,
   Container,
-  CssBaseline,
   Divider,
-  Drawer as MuiDrawer,
-  Grid,
   IconButton,
-  Paper,
-  styled,
   Toolbar,
+  Drawer as MuiDrawer,
+  styled,
 } from "@material-ui/core";
 import { ChevronLeft as ChevronLeftIcon } from "@material-ui/icons";
 import React, { useState } from "react";
 import SoCityImage from "../../assets/img/SoCity.png";
-import Copyright from "../shared/Copyright";
 import Header from "./Header";
-import Orders from "./Orders";
 import { SidebarList } from "./SidebarList";
+import Copyright from "../shared/Copyright";
 
 const drawerWidth: number = 240;
 
@@ -46,13 +42,16 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-export default function DashboardContent() {
+export default function MainLayout({
+  children,
+}: {
+  children: JSX.Element | JSX.Element[];
+}) {
   const [open, setOpen] = useState(false);
   const toggleDrawer = () => setOpen(!open);
 
   return (
     <Box sx={{ display: "flex" }}>
-      <CssBaseline />
       <Drawer variant="permanent" open={open}>
         <Toolbar
           sx={{
@@ -86,11 +85,7 @@ export default function DashboardContent() {
       >
         <Header open={open} toggleDrawer={toggleDrawer} />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Grid item xs={12}>
-            <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-              <Orders />
-            </Paper>
-          </Grid>
+          {children}
           <Copyright />
         </Container>
       </Box>

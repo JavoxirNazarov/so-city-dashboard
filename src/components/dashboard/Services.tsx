@@ -69,10 +69,10 @@ function preventDefault(event: React.MouseEvent) {
   event.preventDefault();
 }
 
-export default function Orders() {
+export default function Services() {
   return (
     <React.Fragment>
-      <Title>Recent Orders</Title>
+      <Title>Services</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -96,7 +96,7 @@ export default function Orders() {
         </TableBody>
       </Table>
       <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
-        See more orders
+        See more services
       </Link>
     </React.Fragment>
   );
