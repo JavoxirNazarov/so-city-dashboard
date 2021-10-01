@@ -5,24 +5,21 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import React, { useContext } from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import SoCityImage from "../assets/img/SoCity.png";
 import Copyright from "../components/shared/Copyright";
-import { AuthContext } from "../context/AuthContext";
+import { logIn } from "../redux/thunks/auth-thunks";
 
 export default function Auth() {
-  const { logIn } = useContext(AuthContext);
+  const development = process.env.NODE_ENV === "development";
+  const dispatch = useDispatch();
+  const [name, setName] = useState(development ? "moder" : "");
+  const [password, setPassword] = useState(
+    development ? '."[(4@&b&jjD^v)[^Dm(Sh$~h2z<PS' : "",
+  );
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-    logIn();
-  };
+  const handleSubmit = () => dispatch(logIn(name, password));
 
   return (
     <Container component="main" maxWidth="xs">
@@ -38,18 +35,22 @@ export default function Auth() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box sx={{ mt: 1 }}>
           <TextField
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             margin="normal"
             required
             fullWidth
-            id="email"
+            id="name"
             label="Email Address"
-            name="email"
-            autoComplete="email"
+            name="name"
+            autoComplete="name"
             autoFocus
           />
           <TextField
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             margin="normal"
             required
             fullWidth
@@ -60,9 +61,9 @@ export default function Auth() {
             autoComplete="current-password"
           />
           <Button
-            type="submit"
             fullWidth
             variant="contained"
+            onClick={handleSubmit}
             sx={{ mt: 3, mb: 2 }}
           >
             Sign In
