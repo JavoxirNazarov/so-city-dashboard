@@ -9,6 +9,8 @@ import NewPartner from "./screens/NewPartner";
 import Partner from "./screens/Partner";
 // import { refreshToken } from "./utils/api/refreshToken";
 import Partners from "./screens/Partners";
+import Service from "./screens/Service";
+import Services from "./screens/Services";
 
 function App() {
   const dispatch = useDispatch();
@@ -49,8 +51,10 @@ function App() {
   return (
     <Switch>
       <Route component={Partners} path="/" exact />
-      <Route component={Partner} path="/partner/:id" />
+      <Route component={Partner} path="/partner/:ID" />
       <Route component={NewPartner} path="/new-partner" />
+      <Route component={Services} path="/services/:partnerID" exact />
+      <Route component={Service} path="/services/:partnerID/:serviceID" />
     </Switch>
   );
 }

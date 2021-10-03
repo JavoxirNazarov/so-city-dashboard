@@ -1,4 +1,5 @@
 import {
+  Checkbox,
   FormControl,
   Grid,
   InputLabel,
@@ -7,80 +8,221 @@ import {
   Select,
   TextField,
 } from "@material-ui/core";
-import React, { useState } from "react";
-import { defCategories } from "../../utils/constants";
+import { TimePicker } from "@material-ui/lab";
+import moment from "moment";
+import "moment-duration-format";
+import React, { ChangeEvent, Dispatch, Fragment, SetStateAction } from "react";
+import { defCategories, defRenders, weekDays } from "../../utils/constants";
+import { INewPartner } from "../../utils/interfaces";
 
-export default function PartnerInfo() {
-  const [partnerInfo, setPartnerInfo] = useState({
-    name: "new test partner",
-    title: "test title",
-    phone: "+7123123412",
-    start_workday: "0",
-    end_workday: "86400",
-    work_unit_interval: "3600",
-    workdays: "0123456",
-    tg_bot: "no",
-    render_type: "regular",
-    category: "common",
-    shop_code: "520262",
-  });
+interface IProps {
+  partnerInfo: INewPartner;
+  setPartnerInfo: Dispatch<SetStateAction<INewPartner>>;
+}
+
+export default function PartnerInfo({ partnerInfo, setPartnerInfo }: IProps) {
+  const handleText = (e: ChangeEvent<HTMLInputElement>) => {
+    setPartnerInfo((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const secondsToTime = (seconds: string) => {
+    var duration = moment
+      .duration(Number(seconds), "seconds")
+      // @ts-ignore
+      .format("hh:mm:ss");
+
+    let strFormat = "ss";
+
+    if (duration.length > 2) strFormat = "mm:ss";
+    if (duration.length > 5) strFormat = "hh:mm:ss";
+
+    return moment(duration, strFormat).toDate();
+  };
+
+  const workDaysArr = partnerInfo?.workdays?.split("");
 
   return (
-    <>
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            name="name"
-            label="Название"
-            fullWidth
-            autoComplete="name"
-            variant="standard"
-          />
-        </Grid>
-
-        <Grid item xs={6}>
-          <TextField
-            required
-            name="title"
-            label="Телефон"
-            fullWidth
-            variant="standard"
-            autoComplete="title"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextField
-            required
-            name="phone"
-            label="Телефон"
-            fullWidth
-            variant="standard"
-            autoComplete="phone"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <FormControl fullWidth>
-            <InputLabel id="demo-multiple-checkbox-label">Категория</InputLabel>
-            <Select
-              label="Категория"
-              labelId="demo-multiple-checkbox-label"
-              id="demo-multiple-checkbox"
-              value={"common"}
-              // onChange={changeCategories}
-            >
-              {defCategories.map((c, idx) => (
-                <MenuItem value={c}>
-                  <ListItemText primary={c} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={6}>
-          {}
-        </Grid>
+    <Grid container spacing={3} mt={2}>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          required
+          name="name"
+          label="Название"
+          fullWidth
+          autoComplete="name"
+          variant="standard"
+          value={partnerInfo?.name}
+          onChange={handleText}
+        />
       </Grid>
-    </>
+
+      <Grid item xs={6}>
+        <TextField
+          required
+          name="title"
+          label="title"
+          fullWidth
+          variant="standard"
+          autoComplete="title"
+          value={partnerInfo?.title}
+          onChange={handleText}
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          required
+          name="phone"
+          label="Телефон"
+          fullWidth
+          variant="standard"
+          autoComplete="phone"
+          value={partnerInfo?.phone}
+          onChange={handleText}
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          required
+          name="shop_code"
+          label="shop_code"
+          fullWidth
+          variant="standard"
+          autoComplete="shop_code"
+          value={partnerInfo?.shop_code}
+          onChange={handleText}
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <TextField
+          required
+          name="tg_bot"
+          label="tg_bot"
+          fullWidth
+          variant="standard"
+          autoComplete="tg_bot"
+          value={partnerInfo?.tg_bot}
+          onChange={handleText}
+        />
+      </Grid>
+      <Grid
+        item
+        xs={6}
+        container
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <TimePicker
+          label="начало работы"
+          value={secondsToTime(partnerInfo?.start_workday)}
+          ampm={false}
+          onChange={(newValue) => {
+            if (newValue) {
+              const hours = newValue?.getHours();
+              const minutes = newValue?.getMinutes();
+
+              if (hours >= 0 || minutes >= 0) {
+                const seconds = 3600 * hours + minutes * 60;
+                setPartnerInfo((prev) => ({
+                  ...prev,
+                  end_workday: String(seconds),
+                }));
+              }
+            }
+          }}
+          renderInput={(params) => <TextField {...params} />}
+        />
+
+        <TimePicker
+          label="конец работы"
+          value={secondsToTime(partnerInfo?.end_workday)}
+          ampm={false}
+          onChange={(newValue) => {
+            if (newValue) {
+              const hours = newValue?.getHours();
+              const minutes = newValue?.getMinutes();
+
+              if (hours >= 0 || minutes >= 0) {
+                const seconds = 3600 * hours + minutes * 60;
+                setPartnerInfo((prev) => ({
+                  ...prev,
+                  end_workday: String(seconds),
+                }));
+              }
+
+              if (hours === 0 && minutes === 0) {
+                setPartnerInfo((prev) => ({
+                  ...prev,
+                  end_workday: "86400",
+                }));
+              }
+            }
+          }}
+          renderInput={(params) => <TextField {...params} />}
+        />
+      </Grid>
+      <Grid item xs={6}>
+        <FormControl fullWidth>
+          <InputLabel id="demo-multiple-checkbox-label">Категория</InputLabel>
+          <Select
+            label="Категория"
+            id="demo-multiple-checkbox"
+            name="category"
+            value={partnerInfo?.category}
+            onChange={handleText as any}
+          >
+            {defCategories.map((c, idx) => (
+              <MenuItem value={c} key={idx}>
+                <ListItemText primary={c} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid item xs={6}>
+        <FormControl fullWidth>
+          <InputLabel id="demo-multiple-checkbox-label">Тип</InputLabel>
+          <Select
+            label="Тип"
+            name="render_type"
+            id="demo-multiple-checkbox"
+            value={partnerInfo?.render_type}
+            onChange={handleText as any}
+          >
+            {defRenders.map((c, idx) => (
+              <MenuItem value={c} key={idx}>
+                <ListItemText primary={c} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid item xs={6} container alignItems="center">
+        {workDaysArr.map((e, index) => (
+          <Fragment key={index}>
+            {weekDays[index]}
+            <Checkbox
+              checked={partnerInfo?.workdays.includes(index.toString())}
+              onClick={() => {
+                let workdays = [...workDaysArr];
+
+                workdays[index] = partnerInfo?.workdays.includes(
+                  index.toString(),
+                )
+                  ? " "
+                  : index.toString();
+
+                setPartnerInfo((prev) => ({
+                  ...prev,
+                  workdays: workdays.join(""),
+                }));
+              }}
+            />
+          </Fragment>
+        ))}
+      </Grid>
+    </Grid>
   );
 }

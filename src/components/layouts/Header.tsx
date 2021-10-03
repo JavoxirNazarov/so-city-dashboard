@@ -1,8 +1,13 @@
-import { Badge, IconButton, Toolbar, Typography } from "@material-ui/core";
+import {
+  //  Badge,
+  IconButton,
+  Toolbar,
+  Typography,
+} from "@material-ui/core";
 import React from "react";
 import {
   Menu as MenuIcon,
-  Notifications as NotificationsIcon,
+  // Notifications as NotificationsIcon,
 } from "@material-ui/icons";
 
 interface HeaderProps {
@@ -39,11 +44,11 @@ export default function Header({ open, toggleDrawer }: HeaderProps) {
       >
         So City
       </Typography>
-      <IconButton color="inherit">
+      {/* <IconButton color="inherit">
         <Badge badgeContent={4} color="secondary">
           <NotificationsIcon />
         </Badge>
-      </IconButton>
+      </IconButton> */}
     </Toolbar>
   );
 }

@@ -4,76 +4,80 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Link,
-  Switch,
-  Grid,
-  Checkbox,
-  TextField,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControl,
-  ListItemText,
-  SelectChangeEvent,
+  // Link,
+  // Switch,
+  // Grid,
+  // Checkbox,
+  // TextField,
+  // InputLabel,
+  // Select,
+  // MenuItem,
+  // FormControl,
+  // ListItemText,
+  // SelectChangeEvent,
 } from "@material-ui/core";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../../utils/api";
-import { defCategories } from "../../utils/constants";
-import { IPartner } from "../../utils/interfaces";
+// import { defCategories } from "../../utils/constants";
+import { IServices } from "../../utils/interfaces";
 import Title from "../Title";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useParams } from "react-router-dom";
 
 export default function List() {
-  const [partners, setPartners] = useState<IPartner[]>([]);
-  const [actives, setActives] = useState(true);
-  const [all, setAll] = useState(false);
-  const [searchName, setSearchName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [categories, setCategories] = useState<string[]>([]);
+  const { partnerID } = useParams<{ partnerID: string }>();
+  const [services, setServices] = useState<IServices[]>([]);
+  // const [actives, setActives] = useState(true);
+  // const [all, setAll] = useState(false);
+  // const [searchName, setSearchName] = useState("");
+  // const [phone, setPhone] = useState("");
+  // const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    api.get<{ msg: IPartner[] }>("/partners/all").then((response) => {
-      setPartners(response?.data?.msg);
-    });
-  }, []);
+    api
+      .get(`/services/list?partner_id=${partnerID}`)
+      .then((serviceResponse) => {
+        setServices(serviceResponse.data?.services);
+      })
+      .catch((err) => console.log(err));
+  }, [partnerID]);
 
-  const filterdPartners = useMemo(() => {
-    let result = partners;
+  // const filterdPartners = useMemo(() => {
+  //   let result = partners;
 
-    if (!all) {
-      result = result.filter((el) => el.is_active === actives);
-    }
+  //   if (!all) {
+  //     result = result.filter((el) => el.is_active === actives);
+  //   }
 
-    if (searchName) {
-      result = result.filter(
-        (el) =>
-          el?.name?.toLowerCase()?.includes(searchName.toLocaleLowerCase()) ||
-          el?.name_ru?.toLowerCase()?.includes(searchName.toLocaleLowerCase()),
-      );
-    }
+  //   if (searchName) {
+  //     result = result.filter(
+  //       (el) =>
+  //         el?.name?.toLowerCase()?.includes(searchName.toLocaleLowerCase()) ||
+  //         el?.name_ru?.toLowerCase()?.includes(searchName.toLocaleLowerCase()),
+  //     );
+  //   }
 
-    if (phone) {
-      result = result.filter((el) => el.phone.includes(phone));
-    }
+  //   if (phone) {
+  //     result = result.filter((el) => el.phone.includes(phone));
+  //   }
 
-    if (categories.length) {
-      result = result.filter((el) => categories.includes(el.category));
-    }
+  //   if (categories.length) {
+  //     result = result.filter((el) => categories.includes(el.category));
+  //   }
 
-    return result;
-  }, [partners, actives, all, searchName, phone, categories]);
+  //   return result;
+  // }, [partners, actives, all, searchName, phone, categories]);
 
-  const changeCategories = (event: SelectChangeEvent<typeof categories>) => {
-    const {
-      target: { value },
-    } = event;
-    setCategories(typeof value === "string" ? value.split(",") : value);
-  };
+  // const changeCategories = (event: SelectChangeEvent<typeof categories>) => {
+  //   const {
+  //     target: { value },
+  //   } = event;
+  //   setCategories(typeof value === "string" ? value.split(",") : value);
+  // };
 
   return (
     <React.Fragment>
-      <Title>Партнёры</Title>
-
+      <Title>Сервисы</Title>
+      {/* 
       <Grid container spacing={3} mb={2} alignItems="center">
         <Grid
           item
@@ -130,48 +134,49 @@ export default function List() {
           </FormControl>
         </Grid>
       </Grid>
+       */}
       <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell>Картинка</TableCell>
             <TableCell>Название</TableCell>
             <TableCell>Название RU</TableCell>
-            <TableCell>Телефон</TableCell>
-            <TableCell>Категория</TableCell>
+            <TableCell>description_of_svc</TableCell>
+            <TableCell>price</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {filterdPartners?.map((partner, i) => (
+          {services?.map((service, i) => (
             <TableRow
               key={i}
               component={RouterLink}
-              to={"/partner/" + partner.id}
+              to={`/services/${partnerID}/${service.id}`}
               style={{ textDecoration: "none" }}
             >
               <TableCell>
                 <img
-                  src={partner.img_url}
+                  src={service.image_url}
                   alt="Картинка"
                   width={30}
                   height={30}
                 />
               </TableCell>
-              <TableCell>{partner?.name}</TableCell>
-              <TableCell>{partner.name_ru}</TableCell>
-              <TableCell>{partner.phone}</TableCell>
-              <TableCell>{partner.category}</TableCell>
+              <TableCell>{service?.name_of_svc}</TableCell>
+              <TableCell>{service.name_of_svc_ru}</TableCell>
+              <TableCell>{service.description_of_svc}</TableCell>
+              <TableCell>{service.price}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <Link
+      {/* <Link
         color="primary"
         to="new-partner"
         component={RouterLink}
         sx={{ mt: 3 }}
       >
         Создать
-      </Link>
+      </Link> */}
     </React.Fragment>
   );
 }
